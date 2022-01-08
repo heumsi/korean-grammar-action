@@ -8,7 +8,6 @@ import requests
 from github import Github
 from whatthepatch import parse_patch
 
-
 def fix(original: str) -> str:
     response = requests.get(
         'https://m.search.naver.com/p/csearch/ocontent/util/SpellerProxy',
@@ -18,18 +17,27 @@ def fix(original: str) -> str:
 
 
 def comment_fix_suggestion(gh_token: str, repo_name: Union[str, int], pr_number: int, target: str) -> None:
+    print(f"gh_token: {gh_token}")
+    print(f"repo_name: {repo_name}")
+    print(f"pr_number: {pr_number}")
+    print(f"target: {target}")    
+
     g = Github(gh_token)
     pr = g.get_repo(repo_name).get_pull(pr_number)
     for file in pr.get_files():
         if target and not re.match(target, file.filename):
             continue
         for diff in parse_patch(file.patch):
+            print("diff!")
             for change in diff.changes:
                 fixed = fix(change.line)
                 if not change.old and fixed != change.line:
+                    commits = pr.get_commits()
+                    for commit in commits:
+                        print(f"commit: {commit}")
                     pr.create_comment(
                         body=f"""```suggestion\n{fixed}\n```""",
-                        commit_id=pr.get_commits()[-1],
+                        commit_id=commits[0],
                         path=file.filename,
                         position=None,
                         side="RIGHT",

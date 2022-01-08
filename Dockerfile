@@ -11,6 +11,7 @@ COPY fix.py /fix.py
 
 # Install requirements
 RUN pip install -r /requirements.txt
+ENV PYTHONUNBUFFERED=1
 
 # Code file to execute when the docker container starts up (`entrypoint.sh`)
 RUN chmod +x /entrypoint.sh
