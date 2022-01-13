@@ -1,12 +1,16 @@
+import logging
 import os
 import json
 import html
 import re
-from typing import Union
+from typing import Union, Optional
 
 import requests
 from github import Github
 from whatthepatch import parse_patch
+
+
+logger = logging.getLogger(__name__)
 
 
 def fix(original: str) -> str:
@@ -17,12 +21,16 @@ def fix(original: str) -> str:
     return html.unescape(response.json()['message']['result']['notag_html'])
 
 
-def comment_fix_suggestion(gh_token: str, repo_name: Union[str, int], pr_number: int, target: str) -> None:
-    g = Github(gh_token)
-    pr = g.get_repo(repo_name).get_pull(pr_number)
+def comment_fix_suggestion(gh_token: str, repo_name: Union[str, int], pr_number: int, target: Optional[str] = None) -> None:
+    github = Github(gh_token)
+    logger.info(f"Getting PR #{pr_number} from {repo_name} ...")
+    pr = github.get_repo(repo_name).get_pull(pr_number)
     commits = pr.get_commits()
-    for file in pr.get_files():
-        if target and not re.match(target, file.filename):
+    logger.info(f"Found {commits.totalCount} commits.")
+    last_commit = commits[commits.totalCount - 1]
+    logger.info(f"Creating comment to last commit ({last_commit.sha[:7]}) ...")
+    for file in last_commit.files:
+        if (target and not re.match(target, file.filename)) or file.filename.split(".")[-1] != "md":
             continue
         for diff in parse_patch(file.patch):
             for change in diff.changes:
