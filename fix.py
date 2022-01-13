@@ -21,7 +21,8 @@ def comment_fix_suggestion(gh_token: str, repo_name: Union[str, int], pr_number:
     g = Github(gh_token)
     pr = g.get_repo(repo_name).get_pull(pr_number)
     commits = pr.get_commits()
-    for file in pr.get_files():
+    last_commit = commits[commits.totalCount - 1]
+    for file in last_commit.files:
         if target and not re.match(target, file.filename):
             continue
         for diff in parse_patch(file.patch):
