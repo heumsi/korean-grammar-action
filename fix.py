@@ -43,7 +43,7 @@ if 'GITHUB_EVENT_PATH' in os.environ:
         json_data = json.load(gh_event)
         comment_fix_suggestion(
             gh_token=os.environ.get('GITHUB_TOKEN'),
-            repo_name=json_data['pull_request']['base']['repo']['full_name'],
+            repo_name=json_data['issue']['pull_request']['base']['repo']['full_name'],
             pr_number=json_data['number'],
             target=os.environ.get('INPUT_TARGET')
         )
