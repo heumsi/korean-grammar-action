@@ -1,4 +1,4 @@
-name: CI
+name: Check korean grammar on pull request comment
 
 on:
   issue_comment:
@@ -6,7 +6,8 @@ on:
       - created
 
 jobs:
-  build:
+  grammar_check:
+    if: ${{ github.event.issue.pull_request && github.event.comment.body == '/맞춤법'}}
     runs-on: ubuntu-latest
     steps:
     - name: "맞춤법 검사"

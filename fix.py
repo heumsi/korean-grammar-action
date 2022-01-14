@@ -41,11 +41,9 @@ def comment_fix_suggestion(gh_token: str, repo_name: Union[str, int], pr_number:
 if 'GITHUB_EVENT_PATH' in os.environ:
     with open(os.environ.get('GITHUB_EVENT_PATH')) as gh_event:
         json_data = json.load(gh_event)
-        import pprint as pp
-        pp.pprint(json_data)
-        # comment_fix_suggestion(
-        #     gh_token=os.environ.get('GITHUB_TOKEN'),
-        #     repo_name=json_data['issue']['pull_request']['base']['repo']['full_name'],
-        #     pr_number=json_data['number'],
-        #     target=os.environ.get('INPUT_TARGET')
-        # )
+        comment_fix_suggestion(
+            gh_token=os.environ.get('GITHUB_TOKEN'),
+            repo_name=os.environ.get('GITHUB_REPOSITORY'),
+            pr_number=json_data['issue']['number'],
+            target=os.environ.get('INPUT_TARGET')
+        )
